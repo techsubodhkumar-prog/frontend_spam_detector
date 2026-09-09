@@ -84,6 +84,7 @@ predictBtn.addEventListener("click", async () => {
     loading.classList.remove("hidden");
 
     try {
+        // Point explicitly to your Render backend URL
         const response = await fetch("https://backend-spam-detector.onrender.com/predict", {
             method: "POST",
             headers: {
@@ -95,7 +96,7 @@ predictBtn.addEventListener("click", async () => {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+            throw new Error(`Server returned status code ${response.status}`);
         }
 
         const data = await response.json();
@@ -140,8 +141,8 @@ predictBtn.addEventListener("click", async () => {
 
     } catch (error) {
         loading.classList.add("hidden");
-        console.error("Prediction Request Failed:", error);
-        alert("Server Error: Unable to communicate with the backend. Check console logs for details.");
+        console.error("Fetch failure error details:", error);
+        alert("Connection Error: Unable to communicate with backend at https://backend-spam-detector.onrender.com/predict");
     }
 
 });
