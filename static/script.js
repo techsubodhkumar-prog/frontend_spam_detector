@@ -28,41 +28,30 @@ const examples = document.querySelectorAll(".example");
 // WORD COUNTER
 // ===============================
 
-function updateCounter(){
-
+function updateCounter() {
     const text = email.value;
 
-    chars.innerHTML =
-        "Characters : " + text.length;
+    chars.innerHTML = "Characters : " + text.length;
 
     const count =
         text.trim() === ""
-        ? 0
-        : text.trim().split(/\s+/).length;
+            ? 0
+            : text.trim().split(/\s+/).length;
 
-    words.innerHTML =
-        "Words : " + count;
-
+    words.innerHTML = "Words : " + count;
 }
 
-email.addEventListener(
-    "input",
-    updateCounter
-);
+email.addEventListener("input", updateCounter);
 
 
 // ===============================
 // CLEAR BUTTON
 // ===============================
 
-clearBtn.addEventListener("click",()=>{
-
-    email.value="";
-
+clearBtn.addEventListener("click", () => {
+    email.value = "";
     updateCounter();
-
     result.classList.add("hidden");
-
 });
 
 
@@ -70,17 +59,11 @@ clearBtn.addEventListener("click",()=>{
 // EXAMPLE EMAILS
 // ===============================
 
-examples.forEach(example=>{
-
-    example.addEventListener("click",()=>{
-
-        email.value =
-            example.innerText.trim();
-
+examples.forEach(example => {
+    example.addEventListener("click", () => {
+        email.value = example.innerText.trim();
         updateCounter();
-
     });
-
 });
 
 
@@ -88,123 +71,77 @@ examples.forEach(example=>{
 // PREDICTION
 // ===============================
 
-predictBtn.addEventListener("click", async()=>{
+predictBtn.addEventListener("click", async () => {
 
     const text = email.value.trim();
 
-    if(text===""){
-
+    if (text === "") {
         alert("Please enter an email.");
-
         return;
-
     }
 
     result.classList.add("hidden");
-
     loading.classList.remove("hidden");
 
-    try{
-
-        // Pointing directly to your deployed Render backend
-        const response =
-        await fetch("https://backend-spam-detector.onrender.com/predict",{
-
-            method:"POST",
-
-            headers:{
-                "Content-Type":"application/json"
+    try {
+        const response = await fetch("https://backend-spam-detector.onrender.com/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
             },
-
-            body:JSON.stringify({
-
-                email:text
-
+            body: JSON.stringify({
+                email: text
             })
-
         });
 
-        const data =
-        await response.json();
+        if (!response.ok) {
+            throw new Error(`HTTP Error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
 
         loading.classList.add("hidden");
 
-        result.classList.remove("hidden");
-
-        if(data.error){
-
+        if (data.error) {
             alert(data.error);
-
             return;
-
         }
 
-        prediction.innerHTML =
-            data.prediction;
+        result.classList.remove("hidden");
 
-        confidence.innerHTML =
-            data.confidence + "%";
-
-        progressBar.style.width =
-            data.confidence + "%";
+        prediction.innerHTML = data.prediction;
+        confidence.innerHTML = data.confidence + "%";
+        progressBar.style.width = data.confidence + "%";
 
 
         // ==========================
         // HAM
         // ==========================
 
-        if(data.prediction==="Ham"){
-
-            prediction.className =
-                "success";
-
-            icon.className =
-                "fa-solid fa-circle-check success";
-
-            icon.innerHTML="";
-
-            message.innerHTML =
-            "This email looks safe and legitimate.";
-
-            progressBar.className =
-                "successBar";
-
+        if (data.prediction === "Ham") {
+            prediction.className = "success";
+            icon.className = "fa-solid fa-circle-check success";
+            icon.innerHTML = "";
+            message.innerHTML = "This email looks safe and legitimate.";
+            progressBar.className = "successBar";
         }
 
         // ==========================
         // SPAM
         // ==========================
 
-        else{
-
-            prediction.className =
-                "danger";
-
-            icon.className =
-                "fa-solid fa-triangle-exclamation danger";
-
-            icon.innerHTML="";
-
-            message.innerHTML =
-            "Warning! This email appears to be spam.";
-
-            progressBar.className =
-                "dangerBar";
-
+        else {
+            prediction.className = "danger";
+            icon.className = "fa-solid fa-triangle-exclamation danger";
+            icon.innerHTML = "";
+            message.innerHTML = "Warning! This email appears to be spam.";
+            progressBar.className = "dangerBar";
         }
 
-    }
-
-    catch(error){
-
+    } catch (error) {
         loading.classList.add("hidden");
-
-        alert(
-            "Server Error."
-        );
-
-        console.log(error);
-
+        console.error("Prediction Request Failed:", error);
+        alert("Server Error: Unable to communicate with the backend. Check console logs for details.");
     }
 
 });
