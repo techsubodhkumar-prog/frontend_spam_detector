@@ -11,11 +11,7 @@ const loading = document.getElementById("loading");
 const result = document.getElementById("result");
 
 const prediction = document.getElementById("prediction");
-const confidence = document.getElementById("confidence");
-
 const message = document.getElementById("message");
-const progressBar = document.getElementById("progressBar");
-
 const icon = document.getElementById("icon");
 
 const words = document.getElementById("words");
@@ -84,7 +80,6 @@ predictBtn.addEventListener("click", async () => {
     loading.classList.remove("hidden");
 
     try {
-        // Point explicitly to your Render backend URL
         const response = await fetch("https://backend-spam-detector.onrender.com/predict", {
             method: "POST",
             headers: {
@@ -111,8 +106,6 @@ predictBtn.addEventListener("click", async () => {
         result.classList.remove("hidden");
 
         prediction.innerHTML = data.prediction;
-        confidence.innerHTML = data.confidence + "%";
-        progressBar.style.width = data.confidence + "%";
 
 
         // ==========================
@@ -124,7 +117,6 @@ predictBtn.addEventListener("click", async () => {
             icon.className = "fa-solid fa-circle-check success";
             icon.innerHTML = "";
             message.innerHTML = "This email looks safe and legitimate.";
-            progressBar.className = "successBar";
         }
 
         // ==========================
@@ -136,7 +128,6 @@ predictBtn.addEventListener("click", async () => {
             icon.className = "fa-solid fa-triangle-exclamation danger";
             icon.innerHTML = "";
             message.innerHTML = "Warning! This email appears to be spam.";
-            progressBar.className = "dangerBar";
         }
 
     } catch (error) {
